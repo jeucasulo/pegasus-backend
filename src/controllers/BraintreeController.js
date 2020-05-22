@@ -12,17 +12,53 @@ const gateway = braintree.connect({
 
 module.exports = {
 
-  async getClientToken(req,res){
+  async getClientToken(req, res) {
     // https://developers.braintreepayments.com/start/hello-server/node
     // https://sandbox.braintreegateway.com/merchants/vn22qp9k6sgcys5s/users/n4kdgwyp7fdp8bjd/api_keys/krbtpzd7d9xhr8t5
     const clientTokenFunction = await gateway.clientToken.generate({
       // customerId: aCustomerId
     }, function (err, response) {
       const clientToken = response.clientToken;
-      return res.json({clientToken:clientToken});
+      return res.json({ clientToken: clientToken });
     });
   },
-  async createCustomer(req,res){
+  async createPayment(req, res) {
+    /*
+    To create a transaction, you must include an amount and either a paymentMethodNonce, a paymentMethodToken, or a customerId.
+    Passing a customerId is equivalent to passing the paymentMethodToken
+    of the customer's default payment method.
+    */
+    //https://developers.braintreepayments.com/reference/request/transaction/sale/node#credit_card.token
+
+    var saleRequest = {
+      amount: req.body.amount,
+      paymentMethodNonce: req.body.nonce,
+      // deviceData: req.body.device_data,
+      // orderId: "Mapped to PayPal Invoice Number",
+      orderId: Date.now(),
+      options: {
+        submitForSettlement: true,
+        paypal: {
+          customField: "PayPal custom field",
+          description: "Description for PayPal email receipt",
+        },
+      }
+    };
+
+    gateway.transaction.sale(saleRequest, function (err, result) {
+      if (err) {
+        // res.send("<h1>Error:  " + err + "</h1>");
+        res.json({ 'Error': err });
+      } else if (result.success) {
+        // res.send("<h1>Success! Transaction ID: " + result.transaction.id + "</h1>");
+        res.json({ 'Success': result });
+      } else {
+        // res.send("<h1>Error:  " + result.message + "</h1>");
+        res.json({ 'Error': result.message });
+      }
+    });
+  },
+  async createCustomer(req, res) {
     let nonceFromTheClient = req.body.payment_method_nonce;
 
     //https://developers.braintreepayments.com/reference/request/customer/create/node
@@ -33,25 +69,18 @@ module.exports = {
     }, function (err, result) {
       // result.success;
       // true
-      if(result.success){
+      if (result.success) {
         return res.json(result);
-      }else{
-        return res.json({"error":"error"});
+      } else {
+        return res.json({ "error": "error" });
       }
 
-      result.customer.id;
+      // result.customer.id;
       // e.g 160923
 
-      result.customer.paymentMethods[0].token;
+      // result.customer.paymentMethods[0].token;
       // e.g f28wm
     });
   },
-  async createPayment(req,res){
-    /*
-    To create a transaction, you must include an amount and either a paymentMethodNonce, a paymentMethodToken, or a customerId.
-    Passing a customerId is equivalent to passing the paymentMethodToken
-    of the customer's default payment method.
-    */
-    //https://developers.braintreepayments.com/reference/request/transaction/sale/node#credit_card.token
-  }
+
 }

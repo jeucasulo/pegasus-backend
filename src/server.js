@@ -27,6 +27,13 @@ const server = require('http').Server(app);
 app.use(cors()); // enable outside access
 app.use(express.json()); // enable the req.body no reutes.post
 
+// app.use(bodyParser.json());
+
+// app.use(express.urlencoded({
+//    extended: true
+// }));
+
+
 // app.use(function(req, res, next) {
 //   res.header("Access-Control-Allow-Origin", "*");
 //   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
