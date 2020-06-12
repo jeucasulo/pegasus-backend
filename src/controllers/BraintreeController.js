@@ -136,6 +136,20 @@ module.exports = {
       // e.g f28wm
     });
   },
+  async deleteCustomer(req, res) {
+    let customerId = req.body.customerId;
+
+    gateway.customer.delete(customerId, function (err) {
+      if (err) {
+        console.log(err);
+        return res.json({ 'Error': 'Error: ' + err })
+      } else {
+        console.log('Customer deleted');
+        return res.json({ 'Success': 'Customer deleted' })
+      }
+      // null
+    });
+  },
   async createCustomerNoNonce(req, res) {
 
 
