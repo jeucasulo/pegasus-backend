@@ -21,6 +21,7 @@ routes.post("/create-customer", Braintree.createCustomer);
 routes.post("/delete-customer", Braintree.deleteCustomer);
 routes.post("/create-customer-no-nonce", Braintree.createCustomerNoNonce);
 routes.post("/create-payment", Braintree.createPayment);
+routes.post("/create-payment-hostedfields", Braintree.createPaymentHostedFields);
 routes.post("/create-vault-transaction", Braintree.createVaultTransaction);
 // routes.post("/create-customer", function(req, res){
 // return res.json({teste:'Ok...'});

@@ -75,6 +75,45 @@ module.exports = {
       }
     });
   },
+  async createPaymentHostedFields(req, res) {
+    /*
+    To create a transaction, you must include an amount and either a paymentMethodNonce, a paymentMethodToken, or a customerId.
+    Passing a customerId is equivalent to passing the paymentMethodToken
+    of the customer's default payment method.
+    */
+    //https://developers.braintreepayments.com/reference/request/transaction/sale/node#credit_card.token
+
+    console.log('req.body.nonce');
+    console.log(req.body.nonce);
+
+    var saleRequest = {
+      amount: req.body.amount,
+      paymentMethodNonce: req.body.nonce,
+      // deviceData: req.body.device_data,
+      // orderId: "Mapped to PayPal Invoice Number",
+      orderId: Date.now(),
+      options: {
+        submitForSettlement: true,
+        paypal: {
+          customField: "PayPal custom field",
+          description: "Description for PayPal email receipt",
+        },
+      }
+    };
+
+    gateway.transaction.sale(saleRequest, function (err, result) {
+      if (err) {
+        // res.send("<h1>Error:  " + err + "</h1>");
+        res.json({ 'Error': err });
+      } else if (result.success) {
+        // res.send("<h1>Success! Transaction ID: " + result.transaction.id + "</h1>");
+        res.json({ 'Success': result });
+      } else {
+        // res.send("<h1>Error:  " + result.message + "</h1>");
+        res.json({ 'Error': result.message });
+      }
+    });
+  },
   async createVaultTransaction(req, res) {
     /*
     To create a transaction, you must include an amount and either a paymentMethodNonce, a paymentMethodToken, or a customerId.
